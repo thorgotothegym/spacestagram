@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Col, Row } from "antd";
 
-function App() {
+import { ViewList } from "./containers/ViewList";
+
+export const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Row>
+        <Col>
+          <header />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <main>
+            <ViewList />
+          </main>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <footer />
+        </Col>
+      </Row>
+    </>
   );
-}
-
-export default App;
+};
