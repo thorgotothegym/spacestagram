@@ -3,4 +3,5 @@ export interface IPicture {
     explanation: string;
     url: string;
     title: string;
+    media_type: string;
 }

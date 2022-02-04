@@ -1,71 +1,87 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { Button, Card } from "antd";
-import { HeartFilled } from "@ant-design/icons";
+import { HeartTwoTone, LikeTwoTone, ShareAltOutlined } from "@ant-design/icons";
+
+import styled from "styled-components";
 
 import { IPicture } from "./type";
 
-interface IHistory {
-  date: string;
-  isFav: boolean;
-}
+const BlockButtons = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+`;
 
 export const CardSpace = ({
   date,
   explanation,
   url,
   title,
+  media_type,
 }: IPicture): JSX.Element => {
-  const [like, setLike] = useState<boolean>(false);
-  const [meme, setMeme] = useState<IHistory[]>([]);
-
-  /* const handleClick = () => {
-    let notesStorage = localStorage.getItem("notes")
-      ? JSON.parse(localStorage.getItem("notes") || "")
-      : [];
-    const existe = notesStorage.filter((item: string) => {
-      if (item === date) {
-        return true;
-      } else {
-        return false;
+  const useLocalStorage = (key: string, initialValue: boolean) => {
+    const [storedValue, setStoredValue] = useState(() => {
+      try {
+        const item = window.localStorage.getItem(key);
+        return item ? JSON.parse(item) : initialValue;
+      } catch (error) {
+        console.log(error);
+        return initialValue;
       }
     });
-    console.log('existe', existe)
-    notesStorage.push(date);
-    localStorage.setItem("notes", JSON.stringify(notesStorage));
-  }; */
-  const handleClick = () => {
-    setLike(!like);
-    const obj = {
-      date: date,
-      isFav: like,
+    const setValue = (value: any) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      } catch (error) {
+        console.log(error);
+      }
     };
-    setMeme([...meme, obj]);
-    // let create store
-    let items = JSON.parse(localStorage.getItem("favs") || "");
-    items = items.filter((item: string) => item !== item);
-    localStorage.setItem("favs", JSON.stringify(items));
-    if (items.length === 0) {
-      localStorage.removeItem("item");
-    }
+    return [storedValue, setValue];
   };
+
+  const [like, setLike] = useLocalStorage(date, false);
+
   return (
     <section>
       <Card
         style={{ width: 500, marginBottom: 10 }}
-        cover={<img src={url} alt={title} />}
+        cover={
+          media_type === "image" ? (
+            <img src={url} alt={title} />
+          ) : (
+            <>
+              <video width="400" controls autoPlay={true} playsInline>
+                <source src={url} />
+              </video>
+            </>
+          )
+        }
       >
         <h1>{title}</h1>
         <h3>{date}</h3>
         <p>{explanation}</p>
-        {like ? <>true</> : <>false</>}
-        <Button
-          type="primary"
-          danger={like ? true : false}
-          shape="circle"
-          icon={<HeartFilled />}
-          onClick={() => handleClick()}
-        />
+        <BlockButtons>
+          <Button
+            type="link"
+            size="middle"
+            block
+            icon={
+              like ? <LikeTwoTone twoToneColor="#eb2f96" /> : <HeartTwoTone />
+            }
+            onClick={() => setLike(!like)}
+          />
+          <Button
+            title="Do you want to share?"
+            size="middle"
+            type="link"
+            block
+            icon={<ShareAltOutlined />}
+            onClick={() => alert("share to love")}
+          />
+        </BlockButtons>
       </Card>
     </section>
   );
