@@ -1,28 +1,46 @@
 import React, { useEffect, useState } from "react";
 
-import { Alert, Image } from "antd";
-
+import { Alert, Image, Affix, Button } from "antd";
 import { getPhotosFromNasa } from "../../service/Nasa";
 
 import { CardSpace } from "../../components/CardSpace";
+import { RangeDate } from "../../components/DatePicker";
 import { IApod } from "./type";
 
 import styled from "styled-components";
 
 import monster404 from "../../image/monster-404.jpg";
+import { SearchOutlined } from "@ant-design/icons";
 
 const StyleError = styled.div`
   text-align: center;
+`;
+
+const WrapperRangeDate = styled.div`
+  flex-direction: row;
+`;
+
+const AffixContent = styled.div`
+  display: flex;
+`;
+
+const ContainterViewList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
 `;
 
 export const ViewList = (): JSX.Element => {
   const [apod, setApod] = useState<IApod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [showFilter, setShowFilter] = useState<boolean>(false);
+
+  const [dummy, setDummy]= useState<any>();
 
   const timeElapsed = Date.now();
   const today = new Date(timeElapsed);
-  console.log('today', today.toISOString().slice(0,10))
+  console.log("today", today.toISOString().slice(0, 10));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -62,13 +80,27 @@ export const ViewList = (): JSX.Element => {
               <Image width={200} src={monster404} alt="404" />
             </StyleError>
           ) : null}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "space-evenly",
-            }}
-          >
+          <>
+            <Affix offsetTop={120} onChange={(affixed) => console.log(affixed)}>
+              <AffixContent>
+                <Button
+                  icon={<SearchOutlined />}
+                  type="primary"
+                  onClick={() => {
+                    setShowFilter(!showFilter);
+                  }}
+                />
+                {showFilter ? (
+                  <WrapperRangeDate>
+                    <RangeDate clickHandler={ (dateStrings) => {
+                      setDummy(dateStrings); console.log('at', dateStrings)
+                    }}/>
+                  </WrapperRangeDate>
+                ) : null}
+              </AffixContent>
+            </Affix>
+          </>
+          <ContainterViewList>
             {apod.map((item: IApod, key: number) => {
               return (
                 <CardSpace
@@ -81,7 +113,7 @@ export const ViewList = (): JSX.Element => {
                 />
               );
             })}
-          </div>
+          </ContainterViewList>
         </article>
       )}
     </>
