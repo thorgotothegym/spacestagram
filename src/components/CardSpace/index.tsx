@@ -53,9 +53,7 @@ export const CardSpace = ({
             <img src={url} alt={title} />
           ) : (
             <>
-              <video width="400" controls autoPlay={true} playsInline>
-                <source src={url} />
-              </video>
+              <embed width="400" height="350" src={url} />
             </>
           )
         }
