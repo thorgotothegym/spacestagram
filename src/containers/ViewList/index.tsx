@@ -36,26 +36,35 @@ export const ViewList = (): JSX.Element => {
   const [error, setError] = useState<boolean>(false);
   const [showFilter, setShowFilter] = useState<boolean>(false);
 
-  const [dummy, setDummy]= useState<any>();
+  const [rangeDate, setRangeDate] = useState<Array<string>>([]);
 
-  const timeElapsed = Date.now();
-  const today = new Date(timeElapsed);
-  console.log("today", today.toISOString().slice(0, 10));
+  const formatDate = (dateStrings: Array<string>): void => {
+    const date = dateStrings.slice(1);
+    const dateToString = date.toString();
+    setApod([]);
+    setLoading(true);
+    getPhotoNasa("", dateToString);
+  };
+
+  const getPhotoNasa = async (
+    dateString?: string,
+    optionalDate?: string
+  ): Promise<void> => {
+    try {
+      const response = await getPhotosFromNasa(dateString, optionalDate);
+      const data = await response;
+      setApod([...apod, ...data]);
+      setLoading(false);
+    } catch (error) {
+      console.log("error", JSON.stringify(error));
+      setError(true);
+    }
+  };
 
   useEffect(() => {
     const controller = new AbortController();
-    const dataApi = async (): Promise<void> => {
-      try {
-        const response = await getPhotosFromNasa();
-        const data = await response;
-        setApod([...apod, ...data]);
-        setLoading(false);
-      } catch (error) {
-        console.log("error", JSON.stringify(error));
-        setError(true);
-      }
-    };
-    dataApi();
+
+    getPhotoNasa();
     return () => {
       controller.abort();
     };
@@ -92,27 +101,35 @@ export const ViewList = (): JSX.Element => {
                 />
                 {showFilter ? (
                   <WrapperRangeDate>
-                    <RangeDate clickHandler={ (dateStrings) => {
-                      setDummy(dateStrings); console.log('at', dateStrings)
-                    }}/>
+                    <RangeDate
+                      clickHandler={(dateStrings) => {
+                        setRangeDate(dateStrings);
+                        formatDate(dateStrings);
+                      }}
+                    />
                   </WrapperRangeDate>
                 ) : null}
               </AffixContent>
             </Affix>
           </>
           <ContainterViewList>
-            {apod.map((item: IApod, key: number) => {
-              return (
-                <CardSpace
-                  date={item.date}
-                  explanation={item.explanation}
-                  url={item.url}
-                  title={item.title}
-                  media_type={item.media_type}
-                  key={key.toString()}
-                />
-              );
-            })}
+            {apod
+              .sort(
+                (first: IApod, second: IApod) =>
+                  0 - (first.date > second.date ? 1 : -1)
+              )
+              .map((item: IApod, key: number) => {
+                return (
+                  <CardSpace
+                    date={item.date}
+                    explanation={item.explanation}
+                    url={item.url}
+                    title={item.title}
+                    media_type={item.media_type}
+                    key={key.toString()}
+                  />
+                );
+              })}
           </ContainterViewList>
         </article>
       )}
