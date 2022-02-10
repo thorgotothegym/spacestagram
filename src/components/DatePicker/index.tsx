@@ -10,7 +10,7 @@ interface IRangeDate {
 
 export const RangeDate = ({ clickHandler }: IRangeDate): JSX.Element => {
   const [dateCallBack, setDateCallBack] = useState<Array<string>>([""]);
-  const dateFormat = "YYYY/MM/DD";
+  const dateFormat = "YYYY-MM-DD";
   const today = moment().format(dateFormat);
 
   return (
@@ -21,7 +21,6 @@ export const RangeDate = ({ clickHandler }: IRangeDate): JSX.Element => {
         onChange={(dates: any, dateStrings: Array<string>) => {
           setDateCallBack(dateStrings);
           clickHandler(dateStrings);
-          console.log("dates, ", dates, "dateStrings, ", dateStrings);
         }}
         format={dateFormat}
       />
